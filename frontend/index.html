@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DAJE Serviços - Apoio em Obra</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-100 text-slate-800 p-4">
+  <div class="max-w-md mx-auto bg-white rounded-lg shadow p-5 space-y-4">
+    <div class="border-b pb-3">
+      <h1 class="text-xl font-bold text-blue-900">DAJE Serviços</h1>
+      <p class="text-sm text-slate-500">Cálculo de Insumos e Vistoria de Contrapiso</p>
+    </div>
+
+    <div>
+      <label class="block text-sm font-semibold mb-1">Comprimento da sala (m):</label>
+      <input type="text" id="comp" inputmode="decimal" placeholder="Ex: 4,5"
+             class="w-full border-2 border-slate-300 p-3 rounded text-lg focus:border-blue-700 outline-none">
+    </div>
+
+    <div>
+      <label class="block text-sm font-semibold mb-1">Largura da sala (m):</label>
+      <input type="text" id="larg" inputmode="decimal" placeholder="Ex: 3,2"
+             class="w-full border-2 border-slate-300 p-3 rounded text-lg focus:border-blue-700 outline-none">
+    </div>
+
+    <div class="space-y-2 pt-1">
+      <p class="text-sm font-semibold">Problemas no contrapiso:</p>
+      <label class="flex items-center gap-3 p-3 bg-slate-50 border rounded cursor-pointer">
+        <input type="checkbox" id="desnivel" class="w-5 h-5 text-blue-700">
+        <span>Desnível ou ondulação</span>
+      </label>
+      <label class="flex items-center gap-3 p-3 bg-slate-50 border rounded cursor-pointer">
+        <input type="checkbox" id="umidade" class="w-5 h-5 text-blue-700">
+        <span>Piso com umidade</span>
+      </label>
+    </div>
+
+    <button onclick="calcular()"
+            class="w-full bg-blue-800 hover:bg-blue-900 text-white font-bold p-3 rounded text-lg mt-4">
+      Calcular Insumos
+    </button>
+
+    <div id="resultado" class="hidden p-4 rounded border-2 space-y-1 mt-4"></div>
+  </div>
+
+  <script>
+    function calcular() {
+      let c = document.getElementById('comp').value.replace(',', '.');
+      let l = document.getElementById('larg').value.replace(',', '.');
+      let comp = parseFloat(c);
+      let larg = parseFloat(l);
+      let desnivel = document.getElementById('desnivel').checked;
+      let umidade = document.getElementById('umidade').checked;
+
+      if (isNaN(comp) || isNaN(larg) || comp <= 0 || larg <= 0) {
+        alert("Preencha o comprimento e a largura corretamente.");
+        return;
+      }
+
+      let area = comp * larg;
+      let caixas = Math.ceil((area * 1.10) / 3.34);
+      let argamassa = desnivel ? Math.ceil(area * 4) : 0;
+      let aprovado = !desnivel && !umidade;
+
+      let box = document.getElementById('resultado');
+      box.classList.remove('hidden');
+
+      if (aprovado) {
+        box.className = "p-4 rounded border-2 bg-emerald-50 border-emerald-600 text-emerald-950 mt-4";
+        box.innerHTML = `
+          <p class="font-bold">✔ Contrapiso Aprovado</p>
+          <p>Área: ${area.toFixed(2)} m²</p>
+          <p>Caixas de piso vinílico: ${caixas} caixas</p>
+        `;
+      } else {
+        box.className = "p-4 rounded border-2 bg-amber-50 border-amber-600 text-amber-950 mt-4";
+        box.innerHTML = `
+          <p class="font-bold">⚠ Atenção: Contrapiso Reprovado</p>
+          <p>Área: ${area.toFixed(2)} m² | Piso: ${caixas} caixas</p>
+          ${desnivel ? `<p class="mt-2 text-sm bg-white p-2 border rounded"><strong>Ação recomendada:</strong> Aplicar cerca de ${argamassa}kg de argamassa de regularização antes da instalação.</p>` : ''}
+          ${umidade ? `<p class="mt-1 text-sm bg-white p-2 border rounded"><strong>Ação recomendada:</strong> Secar e impermeabilizar o contrapiso.</p>` : ''}
+        `;
+      }
+    }
+  </script>
+</body>
+</html>
